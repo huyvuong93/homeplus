@@ -7,12 +7,16 @@
       <input type="number" v-model="newRewardPoint">
       <button type="submit" v-on:click="createReward()">Add</button>
     </div>
-    <ul v-for="(reward, key) in rewards" :key='reward.name'>
-      <li><input type="button" value="Get" v-on:click="getReward(reward, key)">{{ reward.name }} {{reward.point}}pt</li>
-      <div v-if="role === 'mama'">
+    <table>
+    <tr v-for="(reward, key) in rewards" :key='reward.name'>
+      <td>{{ reward.name }}</td>
+      <td>{{reward.point}}pt</td>
+      <td><input type="button" value="Get" v-if="userPoint >= reward.point" v-on:click="getReward(reward, key)"></td>
+      <td v-if="role === 'mama'">
       <button type="submit" v-on:click="deleteReward(key)">Delete</button>
-      </div>
-    </ul>
+      </td>
+    </tr>
+    </table>
   </div>
 </template>
 
@@ -29,9 +33,9 @@ export default {
       newRewardName: '',
       newRewardPoint:'',
       role:'',
-      user:'',
+      userPoint:'',
+      getRewardUser:'',
       rewards: [],
-      myPoint:''
     }
   },
   components:{
@@ -49,12 +53,13 @@ export default {
         function getUserData(uid){
             firebase.database().ref('users/' + firebase.auth().currentUser.uid).once("value", snap =>{
                 _this.role = snap.val().role;
+                _this.userPoint = snap.val().point;
                 console.log(uid)
             })
         }
     
-    this.rewardsRef.on('value', function(snapshot) {
-      _this.rewards = snapshot.val();
+    this.rewardsRef.on('value',snap => {
+      _this.rewards = snap.val();
     });
   },
   methods: {
@@ -65,25 +70,20 @@ export default {
         this.rewardsRef.push({
         name: this.newRewardName,
         point: this.newRewardPoint,
-        user: this.user
+        getRewardUser: this.getRewardUser
       })
       this.newRewardName = "";
       this.newRewardPoint = "";
-      this.user = "";
+      this.getRewardUser = "";
     },
     getReward(reward, key) {
-      reward.user = firebase.auth().currentUser.uid;
-      var _this = this
-      this.database.ref('users/' + firebase.auth().currentUser.uid).on("value", snap =>{
-        _this.myPoint = snap.val().point*1;
-          console.log(_this.myPoint)
-      })
+      reward.getRewardUser = firebase.auth().currentUser.uid;
       this.database.ref('/users/'+ firebase.auth().currentUser.uid).update({
-        point:this.myPoint - reward.point*1,
+        point:this.userPoint*1 - reward.point*1,
       })
-      this.database.ref('/users'+ firebase.auth().currentUser.uid).child('rewards').push({
-        reward
-      })
+      this.database.ref('/users/'+ firebase.auth().currentUser.uid).child("rewards").push(
+        reward.name
+      )
       var updates = {};
       updates['/rewards/' + key ] = reward;
       this.database.ref().update(updates);   

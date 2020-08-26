@@ -3,9 +3,7 @@
         <navigation></navigation>
         <h5 align='center'>Profile</h5>
 
-        <div class="card horizontal" style="max-width:400px;margin:0 auto;">
-            <div class="card-stacked">
-                <div class="card-content">
+                <div class="information">
                     <p>
                         <strong>{{user.name}}</strong>
                         <br>
@@ -16,8 +14,11 @@
                         <strong>{{user.point}}</strong>
                     </p>
                 </div>
-            </div>
-        </div>
+                <div class="rewarded">
+                    <ul v-for="reward in rewards" :key='reward.id'>
+                        <li>{{reward}}</li>
+                    </ul>
+                </div>
     </section>
 </template>
 
@@ -29,6 +30,7 @@ export default {
     data() {
         return {
             user:'',
+            rewards:[]
         };
     },
     components:{
@@ -44,6 +46,7 @@ export default {
         function getUserData(uid){
             firebase.database().ref('users/' + firebase.auth().currentUser.uid).once("value", snap =>{
                 _this.user = snap.val();
+                _this.rewards = snap.val().rewards;
                 console.log(snap.val(),uid)
             })
         }

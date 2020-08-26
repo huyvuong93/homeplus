@@ -8,16 +8,19 @@
       <button type="submit" v-on:click="createTodo()">Add</button>
     </div>
     <ul class="local-nav">
-      <li><button type="submit" v-on:click="showTodoType = 'all'">All</button></li>
+      <li v-if="role ==='mama'"><button type="submit" v-on:click="showTodoType = 'all'">All</button></li>
       <li><button type="submit" v-on:click="showTodoType = 'active'">Incomplete</button></li>
       <li><button type="submit" v-on:click="showTodoType = 'complete'">Completed</button></li>
     </ul>
-    <ul v-for="(todo, key) in filteredTodos" :key='todo.name'>
-      <li><input type="checkbox" v-model="todo.isComplete" v-on:click="updateIsCompleteTodo(todo, key)">{{ todo.name }} {{todo.point}}pt {{todo.completeUser}}</li>
-      <div v-if="role ==='mama'">  
-      <button type="submit"  v-on:click="deleteTodo(key)">Delete</button>
-      </div>
-    </ul>
+    <tr v-for="(todo, key) in filteredTodos" :key='todo.name'>
+      <td><input type="checkbox" v-if="role !=='mama'" v-model="todo.isComplete" v-on:click="updateIsCompleteTodo(todo, key)"></td>
+        <td>{{ todo.name }}</td>
+        <td>{{todo.point}}pt</td>
+        <td>{{todo.completeUser}}</td>
+        <td v-if="role ==='mama'">  
+          <button type="submit"  v-on:click="deleteTodo(key)">Delete</button>
+        </td>
+    </tr>
   </div>
 </template>
 
@@ -33,12 +36,13 @@ export default {
       todosRef: null,
       newTodoName: '',
       newTodoPoint:'',
-      showTodoType: 'all',
+      showTodoType: 'active',
       user:null,
       role:'',
       completeUser:'',
       todos: [],
-      myPoint:''
+      myPoint:'',
+      name:''
     }
   },
   components:{
@@ -55,6 +59,8 @@ export default {
             firebase.database().ref('users/' + firebase.auth().currentUser.uid).once("value", snap =>{
                 _this.user = snap.val();
                 _this.role = snap.val().role;
+                _this.myPoint = snap.val().point*1;
+                _this.name = snap.val().name,
                 console.log(snap.val(),uid)
             })
         }
@@ -101,13 +107,7 @@ export default {
     },
     updateIsCompleteTodo: function (todo, key) {
       todo.isComplete = !todo.isComplete;
-      todo.completeUser = firebase.auth().currentUser.email; 
-      var _this = this
-      this.database.ref('users/' + firebase.auth().currentUser.uid).on("value", snap =>{
-        _this.myPoint = snap.val().point*1;
-        _this.name = snap.val().name,
-          console.log(_this.myPoint)
-      })
+      todo.completeUser = this.name; 
       this.database.ref('/users/'+ firebase.auth().currentUser.uid).update({
         point:this.myPoint + todo.point*1
       }) 
@@ -127,5 +127,8 @@ export default {
     .local-nav{
         display: flex;
         justify-content: space-between;
+    }
+    .local-nav li{
+      list-style: none;
     }
 </style>

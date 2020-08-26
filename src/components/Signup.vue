@@ -6,13 +6,18 @@
         <input type="datetime" placeholder="" v-model="birthday"><br>
         <p>好きなもの</p>
         <input type="text" placeholder="" v-model="hobby"><br>
+        <p>あなたは</p>
+        <input type="radio" id="mama" value="mama" v-model="role">
+        <label for="mama">ママ</label>
+        <input type="radio" id="mama" value="papa" v-model="role">
+        <label for="papa">パパ</label>
         <p>メールアドレス</p>
         <input type="text" placeholder="" v-model="username"><br>
         <p>パスワード</p>
         <input type="password" placeholder="" v-model="password"><br>
-        <v-btn @click='signUp'>登録</v-btn>
+        <button @click='signUp'>登録</button>
         <p>アカウントをお持ちの方</p>
-        <v-btn to="/signin">ログイン</v-btn>
+        <router-link to="/signin">ログイン</router-link>
     </div>
 </template>
 <script>
@@ -27,6 +32,7 @@ export default {
             username:'',
             password:'',
             birthday:'',
+            role:''
 
         }
     },
@@ -39,9 +45,12 @@ export default {
                         email: firebase.auth().currentUser.email,
                         name: this.name,
                         hobby:this.hobby,
+                        role:this.role,
                         birthday: this.birthday,
+                        rewards:'',
                         point:0,
                     });
+                    this.$router.push('/signin')
                     alert("登録ができました");
                 })
             });
