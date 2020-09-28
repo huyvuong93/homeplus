@@ -4,25 +4,31 @@
   </div>
 </template>
 
-<style lang="scss">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  
 }
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+body{
+  margin: 0;
+  background-color: #F8F1E1;
+}
+.navigation{
+  position: fixed;
+  bottom: 0;
+  left:0;
+  z-index: 1;
+  width: 100%;
+  height: 65px;
+  background-color: #fff;
+}
+input[type="text"],
+input[type="password"]{
+  font-size: 20px;
 }
 </style>

@@ -6,11 +6,16 @@ import SignIn from '@/components/Signin.vue'
 import ToDoList from '@/components/ToDoList.vue'
 import Profile from '@/components/Profile.vue'
 import Reward from '@/components/Reward.vue'
-import firebase from 'firebase'
+
 
 Vue.use(VueRouter)
 
   const routes = [
+  {
+    path:'/index.html',
+    component: Home,
+    alias:''
+  },
   {
     path: '/',
     name: 'Home',
@@ -52,34 +57,4 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-
-router.beforeEach((to, from, next) => {
-
-  if (to.matched.some(record => record.meta.auth)) {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        next()
-      } else {
-        next({
-          path: "/signin",
-        })
-      }
-    })
-  } else if (to.matched.some(record => record.meta.guest)) {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        next({
-          path: "/profile",
-        })
-      } else {
-        next()
-      }
-    })
-
-  } else {
-    next()
-  }
-
-})
-
 export default router
